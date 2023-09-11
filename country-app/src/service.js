@@ -7,21 +7,19 @@ const API_ADD_URL = `${API_BASE_URL}/insertCountry`;
 
 
 
-// Örnek getCountries fonksiyonu
-export async function getCountries() {
+
+export const getCountries = async () => {
   try {
-    let response = await fetch(API_GET_URL);
-    if (!response.ok) {
-      throw new Error('API çağrısı başarısız oldu');
-    }
-    let data = await response.json();
-    console.log(data)
-    return { data }; // Verileri içeren bir nesne döndürün
+    console.log('girdi');
+    axios.get(API_GET_URL).then((response) => {
+      console.log(response.data);
+      return response.data
+    });
   } catch (error) {
+    console.error('Hata:', error);
     throw error;
   }
-}
-
+};
 
 
 export const insertCountry = async (country) => {
