@@ -13,6 +13,7 @@ class App extends Component {
         capital: '',
         population: 0,
         numberOfCity: 0,
+        countryId:''
       },
       isUpdate: false,
     };
@@ -47,7 +48,14 @@ class App extends Component {
     console.log("handleNev girişi ")
     try {
       // Yeni ülke verilerini this.state.newCountry içinde alın
-      let newCountryData = this.state.newCountry;
+     // let newCountryData = this.state.newCountry;
+      let newCountryData = {
+            
+            ...this.state.newCountry,
+            population: parseInt(this.state.newCountry.population),
+            numberOfCity: parseInt(this.state.newCountry.population),
+            
+      }
       console.log("handleNev içi ")
       // insertCountry işlevini çağırarak yeni ülkeyi ekleyin
       let response = await insertCountry(newCountryData);
@@ -62,6 +70,7 @@ class App extends Component {
             capital: '',
             population: 0,
             numberOfCity: 0,
+            countryId:''
             
           },
           isUpdate: false,

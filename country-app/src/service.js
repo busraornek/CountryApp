@@ -12,7 +12,7 @@ export const getCountries = async () => {
   try {
     console.log('girdi');
     axios.get(API_GET_URL).then((response) => {
-      console.log(response.data);
+      console.log("servicedata",response.data);
       return response.data
     });
   } catch (error) {

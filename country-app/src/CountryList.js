@@ -5,50 +5,55 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { getCountries } from './service';
 
 const CountryList = ({ onRowClick }) => {
+  
   const [rowData, setRowData] = useState([]);
+  const [gridApi, setGridApi] = useState(null);
+  
+  const [columnDefs] = useState([
+    { field: 'countryName', headerName: 'Country Name' },
+    { field: 'capital', headerName: 'Capital' },
+    { field: 'population', headerName: 'Population' },
+    { field: 'numberOfCity', headerName: 'Number of Cities' },
+    // { field: 'countryId', headerName: 'Country ID' },
+  ]);
+  const onGridReady = params => {
+    setGridApi(params.api);
+  };
 
   useEffect(() => {
-    console.log("usefect içi")
-    const fetchData = async() => {
-      console.log("fectData içi")
-      try {
-        console.log("try içi")
-        let countries = await getCountries();
-        console.log('Başarılı:');
-        setRowData(countries.data);
-        console.log("try sonu")
-      } catch (error) {
-        console.error('Veriler alınırken hata oluştu:', error);
-      }
+    if (gridApi) {
+      gridApi.setRowData(rowData);
     }
+  }, [rowData, gridApi]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let countries = await getCountries();
+        console.log({countries})
+        setRowData(countries);
+      } catch (error) {
+        console.error('Error fetching country data:', error);
+      }
+    };
 
     fetchData();
   }, []);
+  useEffect(() => {
+    console.log("data has come")
+  }, [rowData]);
 
-  const columnDefs = [
-    { headerName: 'Ülke Adı', field: 'countryName', sortable: true, filter: true },
-    { headerName: 'Başkenti', field: 'capital', sortable: true, filter: true },
-    { headerName: 'Nüfus', field: 'population', sortable: true, filter: true },
-    { headerName: 'Şehir Sayısı', field: 'numberOfCity', sortable: true, filter: true },
-  ];
-
-  let gridOptions = {
-    rowData: rowData,
-    onRowClicked: (event) => {
-      let selectedCountry = event.data;
-      onRowClick(selectedCountry);
-    },
-  };
+  console.log(columnDefs)
 
   return (
-    <div className="ag-theme-alpine" style={{ height: '300px', width: '100%' }}>
+    <div className="ag-theme-alpine" style={{ height: '400px', width: '600px' }}>
       <AgGridReact
+        onGridReady={onGridReady}
         columnDefs={columnDefs}
-        gridOptions={gridOptions}
-        
+        onRowClicked={onRowClick}
       />
     </div>
   );
-}
+};
 
 export default CountryList;
