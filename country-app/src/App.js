@@ -13,20 +13,28 @@ class App extends Component {
         capital: '',
         population: 0,
         numberOfCity: 0,
-        countryId:''
+        countryId: ''
       },
       isUpdate: false,
     };
   }
-  
+
 
   componentDidMount() {
     this.fetchCountries();
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.countries !== this.state.countries) {
+      console.log('Ülkeler güncellendi');
+    }
+  }
+
+
   async fetchCountries() {
     let countries = await getCountries();
-    this.setState({ countries });
+    console.log("fetchCountries içi", countries)
+    this.setState({ countries: countries.data });
   }
 
 
@@ -35,56 +43,47 @@ class App extends Component {
     this.setState((prevState) => ({
       newCountry: {
         ...prevState.newCountry,
-        [name]: value, // Hangi girdi alanının değiştirildiğini 'name' özelliği ile belirle
+        [name]: value, 
       },
     }));
   };
-  
-  
- 
 
-
-  handleNewClick = async () => {
+  handleSaveClick = async () => {
     console.log("handleNev girişi ")
     try {
-      // Yeni ülke verilerini this.state.newCountry içinde alın
-     // let newCountryData = this.state.newCountry;
       let newCountryData = {
-            
-            ...this.state.newCountry,
-            population: parseInt(this.state.newCountry.population),
-            numberOfCity: parseInt(this.state.newCountry.population),
-            
+
+        ...this.state.newCountry,
+        population: parseInt(this.state.newCountry.population),
+        numberOfCity: parseInt(this.state.newCountry.population),
+
       }
       console.log("handleNev içi ")
-      // insertCountry işlevini çağırarak yeni ülkeyi ekleyin
       let response = await insertCountry(newCountryData);
-  console.log("if ")
-      if (response && response.success) {
+      console.log( response)
+      if (response ) {
         console.log("if içi ")
-        // Yeni ülke başarıyla eklendi, yeni ülkeyi eklemek için state'i güncelleyin
-        this.setState((prevState) => ({
-          countries: [...prevState.countries, newCountryData],
-          newCountry: {
-            countryName: '',
-            capital: '',
-            population: 0,
-            numberOfCity: 0,
-            countryId:''
-            
-          },
-          isUpdate: false,
-          
-        })); console.log("if dışı")
+      window.location.reload();
+
       } else {
-        // Yeni ülke eklerken hata oluştu, hata mesajını işleyin veya kullanıcıya bildirin.
-        console.error('Yeni ülke eklenirken bir hata oluştu.');
+        console.error('Yeni ---- ülke eklenirken bir hata oluştu.');
       }
     } catch (error) {
       console.error('Yeni ülke eklerken bir hata oluştu:', error);
     }
   };
-  
+  handleNewClick = () => {
+    this.setState({
+      newCountry: {
+        countryName: '',
+        capital: '',
+        population: '',
+        numberOfCity: ''
+      },
+      isUpdate: false
+    });
+  }
+
   handleCountryNameChange = (e) => {
     const { value } = e.target;
     this.setState((prevState) => ({
@@ -94,7 +93,6 @@ class App extends Component {
       },
     }));
   }
-  
   handleCapitalChange = (e) => {
     const { value } = e.target;
     this.setState((prevState) => ({
@@ -104,17 +102,17 @@ class App extends Component {
       },
     }));
   }
-  
   handlePopulationChange = (e) => {
     const { value } = e.target;
     this.setState((prevState) => ({
+
       newCountry: {
         ...prevState.newCountry,
         population: value,
+
       },
     }));
   }
-  
   handleNumberOfCityChange = (e) => {
     const { value } = e.target;
     this.setState((prevState) => ({
@@ -124,23 +122,14 @@ class App extends Component {
       },
     }));
   }
-  
-
   handleUpdateClick = async () => {
     const { newCountry, countries } = this.state;
-    
-    // Mevcut seçili ülkenin index'ini bulun (örneğin, seçili bir ülke olsun).
     const selectedIndex = countries.findIndex((country) => country.name === newCountry.name);
-  
+
     if (selectedIndex !== -1) {
-      // Seçilen ülkenin index'ini bulduğumuzda, yeni verilerle güncelleyin.
       const updatedCountries = [...countries];
       updatedCountries[selectedIndex] = newCountry;
-  
-      // Servis fonksiyonunu kullanarak güncelleme işlemini gerçekleştirin (örneğin, updateCountry fonksiyonu kullanılsın).
       await updateCountry(newCountry);
-  
-      // Güncellenmiş ülkelerle birlikte durumu güncelleyin.
       this.setState({
         countries: updatedCountries,
         newCountry: {},
@@ -148,62 +137,55 @@ class App extends Component {
       });
     }
   };
-  
   handleRowClick = (country) => {
-    // Tıklanan ülkenin bilgilerini işlemek için bu işlevi kullanabilirsiniz.
     console.log('Tıklanan Ülke:', country);
-    // Başka işlemler yapabilirsiniz, örneğin seçili ülkenin detay sayfasına yönlendirebilirsiniz.
-     this.setState({
-      newCountry: country,
-      isUpdate: true, // Bu, güncelleme modunu etkinleştirebilir
+    this.setState({
+      newCountry: country.data,
+      isUpdate: true,
     });
   };
-
   render() {
     return (
       <div>
-        
         <CountryInput
-  label="Ülke Adı"
-  name="countryName"
-  value={this.state.newCountry.countryName}
-  onChange={this.handleInputChange}
-/>
-<CountryInput
-  label="Başkenti"
-  name="capital"
-  value={this.state.newCountry.capital}
-  onChange={this.handleInputChange}
-/>
-<CountryInput
-  label="Nüfus"
-  name="population"
-  value={this.state.newCountry.population}
-  onChange={this.handleInputChange}
-/>
-<CountryInput
-  label="Şehir Sayısı"
-  name="numberOfCity"
-  value={this.state.newCountry.numberOfCity}
-  onChange={this.handleInputChange}
-/>
+          label="Ülke Adı"
+          name="countryName"
+          value={this.state.newCountry.countryName}
+          onChange={this.handleInputChange}
+        />
+        <CountryInput
+          label="Başkenti"
+          name="capital"
+          value={this.state.newCountry.capital}
+          onChange={this.handleInputChange}
+        />
+        <CountryInput
+          label="Nüfus"
+          name="population"
+          value={this.state.newCountry.population}
+          onChange={this.handleInputChange}
+        />
+        <CountryInput
+          label="Şehir Sayısı"
+          name="numberOfCity"
+          value={this.state.newCountry.numberOfCity}
+          onChange={this.handleInputChange}
+        />
 
         {/* Add more input components for other fields */}
-       
-       <button onClick={this.state.isUpdate ? this.handleNewClick : this.handleNewClick}>
-  {this.state.isUpdate ? 'New' : 'Yeni'}
-</button>
-<button onClick={this.state.isUpdate ? this.handleInputChange : this.handleNewClick}>
-  {this.state.isUpdate ? 'Add' : 'Kaydet'}
-</button>
-<button onClick={this.state.isUpdate ? this.handleUpdateClick : this.handleNewClick}>
-  {this.state.isUpdate ? 'Update' : 'Güncelle'}
-</button>
 
+        <button onClick={this.handleNewClick}>
+          Yeni
+        </button>
+        <button onClick={this.handleSaveClick} disabled={this.state.isUpdate}>
+          Kaydet
+        </button>
+        <button onClick={this.handleUpdateClick} disabled={!this.state.isUpdate}>
+          Güncelle
+        </button>
         <CountryList countries={this.state.countries} onRowClick={this.handleRowClick} />
       </div>
     );
   }
 }
-
 export default App;

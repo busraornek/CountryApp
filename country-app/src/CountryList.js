@@ -4,7 +4,7 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { getCountries } from './service';
 
-const CountryList = ({ onRowClick }) => {
+const CountryList = ({ onRowClick, countries }) => {
   
   const [rowData, setRowData] = useState([]);
   const [gridApi, setGridApi] = useState(null);
@@ -14,34 +14,22 @@ const CountryList = ({ onRowClick }) => {
     { field: 'capital', headerName: 'Capital' },
     { field: 'population', headerName: 'Population' },
     { field: 'numberOfCity', headerName: 'Number of Cities' },
-    // { field: 'countryId', headerName: 'Country ID' },
+  
   ]);
+  
   const onGridReady = params => {
     setGridApi(params.api);
   };
 
   useEffect(() => {
     if (gridApi) {
-      gridApi.setRowData(rowData);
+      gridApi.setRowData(countries);
     }
-  }, [rowData, gridApi]);
+  }, [countries, gridApi]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let countries = await getCountries();
-        console.log({countries})
-        setRowData(countries);
-      } catch (error) {
-        console.error('Error fetching country data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-  useEffect(() => {
-    console.log("data has come")
-  }, [rowData]);
+    console.log("data has come", countries);
+  }, [countries]);
 
   console.log(columnDefs)
 
